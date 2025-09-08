@@ -382,6 +382,57 @@ export type Database = {
           },
         ]
       }
+      transactions: {
+        Row: {
+          ai_processed: boolean | null
+          amount: number
+          category_id: string | null
+          created_at: string
+          date: string
+          deleted_at: string | null
+          method: string
+          name: string
+          notes: string | null
+          photo_url: string | null
+          transaction_id: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ai_processed?: boolean | null
+          amount: number
+          category_id?: string | null
+          created_at?: string
+          date?: string
+          deleted_at?: string | null
+          method: string
+          name: string
+          notes?: string | null
+          photo_url?: string | null
+          transaction_id?: string
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ai_processed?: boolean | null
+          amount?: number
+          category_id?: string | null
+          created_at?: string
+          date?: string
+          deleted_at?: string | null
+          method?: string
+          name?: string
+          notes?: string | null
+          photo_url?: string | null
+          transaction_id?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       users: {
         Row: {
           created_at: string
