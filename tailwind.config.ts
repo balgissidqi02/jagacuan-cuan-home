@@ -47,6 +47,42 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        expense: {
+          DEFAULT: "hsl(var(--expense))",
+          foreground: "hsl(var(--expense-foreground))",
+        },
+        income: {
+          DEFAULT: "hsl(var(--income))",
+          foreground: "hsl(var(--income-foreground))",
+        },
+        savings: {
+          DEFAULT: "hsl(var(--savings))",
+          foreground: "hsl(var(--savings-foreground))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
+        },
+        budgeting: {
+          bg: "hsl(var(--budgeting-bg))",
+          color: "hsl(var(--budgeting-color))",
+        },
+        spending: {
+          bg: "hsl(var(--spending-bg))",
+          color: "hsl(var(--spending-color))",
+        },
+        goals: {
+          bg: "hsl(var(--goals-bg))",
+          color: "hsl(var(--goals-color))",
+        },
+        education: {
+          bg: "hsl(var(--education-bg))",
+          color: "hsl(var(--education-color))",
+        },
+        challenges: {
+          bg: "hsl(var(--challenges-bg))",
+          color: "hsl(var(--challenges-color))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
