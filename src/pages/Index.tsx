@@ -148,10 +148,7 @@ const Index = () => {
                 icon={item.icon}
                 bgColor={item.bgColor}
                 iconColor={item.iconColor}
-                onClick={() => {
-                  // Navigation would go here
-                  console.log(`Navigate to ${item.url}`)
-                }}
+                url={item.url}
               />
             ))}
           </div>
