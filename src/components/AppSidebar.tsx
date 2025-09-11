@@ -1,4 +1,4 @@
-import { Home, DollarSign, TrendingDown, Target, Trophy, GraduationCap } from "lucide-react"
+import { Home, Wallet, TrendingDown, Target, Trophy, GraduationCap, User } from "lucide-react"
 import { NavLink, useLocation } from "react-router-dom"
 
 import {
@@ -16,11 +16,12 @@ import {
 
 const items = [
   { title: "Dashboard", url: "/", icon: Home },
-  { title: "Budgeting", url: "/budgeting", icon: DollarSign },
+  { title: "Budget", url: "/budgeting", icon: Wallet },
   { title: "Spending", url: "/spending", icon: TrendingDown },
   { title: "Goals", url: "/goals", icon: Target },
-  { title: "Challenges", url: "/challenges", icon: Trophy },
+  { title: "Challenge", url: "/challenge", icon: Trophy },
   { title: "Education", url: "/education", icon: GraduationCap },
+  { title: "Profile", url: "/profile", icon: User },
 ]
 
 export function AppSidebar() {

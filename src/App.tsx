@@ -5,8 +5,15 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppSidebar } from "@/components/AppSidebar";
+import { Navbar } from "@/components/Navbar";
 import Index from "./pages/Index";
+import Budgeting from "./pages/Budgeting";
 import Spending from "./pages/Spending";
+import SpendingTracker from "./pages/SpendingTracker";
+import Goals from "./pages/Goals";
+import Education from "./pages/Education";
+import Challenge from "./pages/Challenge";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -21,18 +28,20 @@ const App = () => (
           <div className="min-h-screen flex w-full bg-background">
             <AppSidebar />
             <main className="flex-1">
-              <header className="h-14 flex items-center border-b bg-card px-4">
-                <SidebarTrigger />
-                <div className="ml-4">
-                  <h1 className="font-semibold text-lg">JagaCuan Dashboard</h1>
-                </div>
-              </header>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/spending" element={<Spending />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+              <Navbar />
+              <div className="p-0">
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/budgeting" element={<Budgeting />} />
+                  <Route path="/spending" element={<SpendingTracker />} />
+                  <Route path="/goals" element={<Goals />} />
+                  <Route path="/education" element={<Education />} />
+                  <Route path="/challenge" element={<Challenge />} />
+                  <Route path="/profile" element={<Profile />} />
+                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </div>
             </main>
           </div>
         </SidebarProvider>
