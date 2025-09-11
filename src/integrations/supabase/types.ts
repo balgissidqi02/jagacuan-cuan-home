@@ -17,53 +17,32 @@ export type Database = {
       budgeting: {
         Row: {
           amount: number
-          budget_id: string
-          category_id: string | null
+          category: string
           created_at: string
-          deleted_at: string | null
-          end_date: string
-          start_date: string
+          id: string
+          spent: number
           updated_at: string
           user_id: string
         }
         Insert: {
-          amount: number
-          budget_id?: string
-          category_id?: string | null
+          amount?: number
+          category: string
           created_at?: string
-          deleted_at?: string | null
-          end_date: string
-          start_date: string
+          id?: string
+          spent?: number
           updated_at?: string
           user_id: string
         }
         Update: {
           amount?: number
-          budget_id?: string
-          category_id?: string | null
+          category?: string
           created_at?: string
-          deleted_at?: string | null
-          end_date?: string
-          start_date?: string
+          id?: string
+          spent?: number
           updated_at?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "budgeting_category_id_fkey"
-            columns: ["category_id"]
-            isOneToOne: false
-            referencedRelation: "categories"
-            referencedColumns: ["category_id"]
-          },
-          {
-            foreignKeyName: "budgeting_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["user_id"]
-          },
-        ]
+        Relationships: []
       }
       categories: {
         Row: {
@@ -334,51 +313,32 @@ export type Database = {
       spending_tracker: {
         Row: {
           amount: number
-          category_id: string | null
+          budget_id: string | null
           created_at: string
-          date: string
-          deleted_at: string | null
-          note: string | null
-          tracker_id: string
-          updated_at: string
-          user_id: string
+          description: string
+          id: string
         }
         Insert: {
           amount: number
-          category_id?: string | null
+          budget_id?: string | null
           created_at?: string
-          date?: string
-          deleted_at?: string | null
-          note?: string | null
-          tracker_id?: string
-          updated_at?: string
-          user_id: string
+          description: string
+          id?: string
         }
         Update: {
           amount?: number
-          category_id?: string | null
+          budget_id?: string | null
           created_at?: string
-          date?: string
-          deleted_at?: string | null
-          note?: string | null
-          tracker_id?: string
-          updated_at?: string
-          user_id?: string
+          description?: string
+          id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "spending_tracker_category_id_fkey"
-            columns: ["category_id"]
+            foreignKeyName: "spending_tracker_budget_id_fkey"
+            columns: ["budget_id"]
             isOneToOne: false
-            referencedRelation: "categories"
-            referencedColumns: ["category_id"]
-          },
-          {
-            foreignKeyName: "spending_tracker_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["user_id"]
+            referencedRelation: "budgeting"
+            referencedColumns: ["id"]
           },
         ]
       }
