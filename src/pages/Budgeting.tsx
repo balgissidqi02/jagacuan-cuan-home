@@ -6,7 +6,7 @@ import { Progress } from "@/components/ui/progress"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { supabase } from "@/integrations/supabase/client"
+import { supabase } from "@/lib/supabaseClient"
 import { formatRupiah } from "@/utils/currency"
 import { toast } from "sonner"
 
@@ -250,8 +250,8 @@ export default function Budgeting() {
         <Card className="rounded-2xl shadow-soft p-12 text-center">
           <div className="text-muted-foreground">
             <Wallet className="h-16 w-16 mx-auto mb-4 opacity-50" />
-            <h3 className="text-lg font-medium mb-2">No budgets yet</h3>
-            <p className="text-sm">Create your first budget to start tracking your expenses</p>
+            <h3 className="text-lg font-medium mb-2">Belum ada budget</h3>
+            <p className="text-sm">Tambahkan budget pertama untuk mulai melacak pengeluaran Anda</p>
           </div>
         </Card>
       )}

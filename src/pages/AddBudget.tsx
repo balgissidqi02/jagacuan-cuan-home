@@ -6,16 +6,16 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { supabase } from "@/integrations/supabase/client"
+import { supabase } from "@/lib/supabaseClient"
 import { formatRupiah } from "@/utils/currency"
 import { toast } from "sonner"
 import { Utensils, Car, Gamepad2, GraduationCap, MoreHorizontal } from "lucide-react"
 
 const categories = [
-  { name: "Food & Drinks", icon: Utensils, color: "bg-orange-500" },
-  { name: "Transportation", icon: Car, color: "bg-blue-500" },
-  { name: "Entertainment", icon: Gamepad2, color: "bg-purple-500" },
-  { name: "Education", icon: GraduationCap, color: "bg-green-500" },
+  { name: "Food", icon: Utensils, color: "bg-orange-500" },
+  { name: "Transport", icon: Car, color: "bg-blue-500" },
+  { name: "Fun", icon: Gamepad2, color: "bg-purple-500" },
+  { name: "Study", icon: GraduationCap, color: "bg-green-500" },
   { name: "Other", icon: MoreHorizontal, color: "bg-gray-500" }
 ]
 
@@ -41,7 +41,7 @@ export default function AddBudget() {
     }
 
     if (!formData.amount || parseFloat(formData.amount) <= 0) {
-      toast.error('Please enter a valid budget amount')
+      toast.error('Budget must be greater than 0')
       return
     }
 
@@ -60,7 +60,7 @@ export default function AddBudget() {
 
       if (error) throw error
       
-      toast.success('Budget added successfully!')
+      toast.success('Budget berhasil ditambahkan')
       navigate('/budgeting')
     } catch (error) {
       console.error('Error adding budget:', error)
