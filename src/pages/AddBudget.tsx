@@ -60,7 +60,7 @@ export default function AddBudget() {
 
       if (error) throw error
       
-      toast.success('Budget added successfully!')
+      toast.success('Budget berhasil ditambahkan!')
       navigate('/budgeting')
     } catch (error) {
       console.error('Error adding budget:', error)
