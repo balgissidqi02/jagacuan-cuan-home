@@ -20,6 +20,8 @@ export type Database = {
           category: string
           created_at: string
           id: string
+          notes: string | null
+          period: string | null
           spent: number
           updated_at: string
           user_id: string
@@ -29,6 +31,8 @@ export type Database = {
           category: string
           created_at?: string
           id?: string
+          notes?: string | null
+          period?: string | null
           spent?: number
           updated_at?: string
           user_id: string
@@ -38,6 +42,8 @@ export type Database = {
           category?: string
           created_at?: string
           id?: string
+          notes?: string | null
+          period?: string | null
           spent?: number
           updated_at?: string
           user_id?: string

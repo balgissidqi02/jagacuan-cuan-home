@@ -8,6 +8,7 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { Navbar } from "@/components/Navbar";
 import Index from "./pages/Index";
 import Budgeting from "./pages/Budgeting";
+import AddBudget from "./pages/AddBudget";
 import Spending from "./pages/Spending";
 import SpendingTracker from "./pages/SpendingTracker";
 import Goals from "./pages/Goals";
@@ -33,6 +34,7 @@ const App = () => (
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/budgeting" element={<Budgeting />} />
+                  <Route path="/add-budget" element={<AddBudget />} />
                   <Route path="/spending" element={<SpendingTracker />} />
                   <Route path="/goals" element={<Goals />} />
                   <Route path="/education" element={<Education />} />

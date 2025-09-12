@@ -6,86 +6,11 @@ import { NavLink } from "react-router-dom"
 export function Navbar() {
   return (
     <nav className="h-16 border-b bg-card px-6 flex items-center justify-between">
-      <div className="flex items-center gap-8">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-primary-foreground font-bold text-sm">
-            JC
-          </div>
-          <span className="font-bold text-lg text-foreground">JagaCuan</span>
+      <div className="flex items-center gap-2">
+        <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-primary-foreground font-bold text-sm">
+          JC
         </div>
-        
-        <div className="hidden md:flex items-center gap-6">
-          <NavLink 
-            to="/" 
-            className={({ isActive }) => 
-              `text-sm font-medium transition-colors hover:text-primary ${
-                isActive ? "text-primary" : "text-muted-foreground"
-              }`
-            }
-          >
-            Home
-          </NavLink>
-          <NavLink 
-            to="/budgeting" 
-            className={({ isActive }) => 
-              `text-sm font-medium transition-colors hover:text-primary ${
-                isActive ? "text-primary" : "text-muted-foreground"
-              }`
-            }
-          >
-            Budget
-          </NavLink>
-          <NavLink 
-            to="/spending" 
-            className={({ isActive }) => 
-              `text-sm font-medium transition-colors hover:text-primary ${
-                isActive ? "text-primary" : "text-muted-foreground"
-              }`
-            }
-          >
-            Spending
-          </NavLink>
-          <NavLink 
-            to="/goals" 
-            className={({ isActive }) => 
-              `text-sm font-medium transition-colors hover:text-primary ${
-                isActive ? "text-primary" : "text-muted-foreground"
-              }`
-            }
-          >
-            Goals
-          </NavLink>
-          <NavLink 
-            to="/education" 
-            className={({ isActive }) => 
-              `text-sm font-medium transition-colors hover:text-primary ${
-                isActive ? "text-primary" : "text-muted-foreground"
-              }`
-            }
-          >
-            Education
-          </NavLink>
-          <NavLink 
-            to="/challenge" 
-            className={({ isActive }) => 
-              `text-sm font-medium transition-colors hover:text-primary ${
-                isActive ? "text-primary" : "text-muted-foreground"
-              }`
-            }
-          >
-            Challenge
-          </NavLink>
-          <NavLink 
-            to="/profile" 
-            className={({ isActive }) => 
-              `text-sm font-medium transition-colors hover:text-primary ${
-                isActive ? "text-primary" : "text-muted-foreground"
-              }`
-            }
-          >
-            Profile
-          </NavLink>
-        </div>
+        <span className="font-bold text-lg text-foreground">JagaCuan</span>
       </div>
 
       <div className="flex items-center gap-4">
