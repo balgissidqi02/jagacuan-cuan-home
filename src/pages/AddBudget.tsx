@@ -71,8 +71,9 @@ export default function AddBudget() {
   }
 
   return (
-    <div className="p-6 max-w-2xl mx-auto">
-      <Card className="bg-white rounded-2xl shadow-lg border-0">
+    <div className="min-h-screen bg-background p-6">
+      <div className="max-w-2xl mx-auto">
+        <Card className="bg-card rounded-2xl shadow-lg border-0">
         <CardHeader className="relative">
           <div className="flex items-start justify-between">
             <div>
@@ -177,7 +178,8 @@ export default function AddBudget() {
             </Button>
           </form>
         </CardContent>
-      </Card>
+        </Card>
+      </div>
     </div>
   )
 }

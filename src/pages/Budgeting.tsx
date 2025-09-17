@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react"
 import { Plus, Wallet } from "lucide-react"
+import { useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { supabase } from "@/lib/supabaseClient"
 import { formatRupiah } from "@/utils/currency"
 import { toast } from "sonner"
@@ -29,12 +27,8 @@ const categoryColors = {
 }
 
 export default function Budgeting() {
+  const navigate = useNavigate()
   const [budgets, setBudgets] = useState<Budget[]>([])
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [formData, setFormData] = useState({
-    category: "",
-    amount: ""
-  })
   const [loading, setLoading] = useState(true)
 
   // Mock user ID for demo - in real app this would come from auth
@@ -75,28 +69,6 @@ export default function Budgeting() {
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    try {
-      const { error } = await supabase
-        .from('budgeting')
-        .insert({
-          category: formData.category,
-          amount: parseFloat(formData.amount),
-          user_id: userId
-        })
-
-      if (error) throw error
-      
-      toast.success('Budget added successfully!')
-      setIsModalOpen(false)
-      setFormData({ category: "", amount: "" })
-    } catch (error) {
-      console.error('Error adding budget:', error)
-      toast.error('Failed to add budget')
-    }
-  }
 
   const totalBudget = budgets.reduce((sum, budget) => sum + budget.amount, 0)
   const totalSpent = budgets.reduce((sum, budget) => sum + budget.spent, 0)
@@ -114,48 +86,13 @@ export default function Budgeting() {
           <p className="text-muted-foreground mt-1">Manage your spending categories</p>
         </div>
         
-        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-          <DialogTrigger asChild>
-            <Button className="flex items-center gap-2">
-              <Plus className="h-4 w-4" />
-              Add Budget
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add New Budget Category</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <Label htmlFor="category">Category</Label>
-                <Input
-                  id="category"
-                  type="text"
-                  value={formData.category}
-                  onChange={(e) => setFormData({...formData, category: e.target.value})}
-                  placeholder="e.g., Food & Drinks"
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="amount">Budget Amount</Label>
-                <Input
-                  id="amount"
-                  type="number"
-                  value={formData.amount}
-                  onChange={(e) => setFormData({...formData, amount: e.target.value})}
-                  placeholder="0"
-                  required
-                  min="0"
-                  step="0.01"
-                />
-              </div>
-              <Button type="submit" className="w-full">
-                Add Budget
-              </Button>
-            </form>
-          </DialogContent>
-        </Dialog>
+        <Button 
+          className="flex items-center gap-2"
+          onClick={() => navigate('/add-budget')}
+        >
+          <Plus className="h-4 w-4" />
+          Add Budget
+        </Button>
       </div>
 
       {/* Summary Cards */}
