@@ -27,30 +27,37 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <SidebarProvider>
-          <div className="min-h-screen flex w-full bg-background">
-            <AppSidebar />
-            <main className="flex-1">
-              <Navbar />
-              <div className="p-0">
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/budgeting" element={<Budgeting />} />
-                  <Route path="/add-budget" element={<AddBudget />} />
-                  <Route path="/spending" element={<SpendingTracker />} />
-                  <Route path="/goals" element={<Goals />} />
-                  <Route path="/education" element={<Education />} />
-                  <Route path="/challenge" element={<Challenge />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/register" element={<RegisterPage />} />
-                  <Route path="/login" element={<LoginPage />} />
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
+        <Routes>
+          {/* Auth routes without sidebar */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          
+          {/* App routes with sidebar */}
+          <Route path="/*" element={
+            <SidebarProvider>
+              <div className="min-h-screen flex w-full bg-background">
+                <AppSidebar />
+                <main className="flex-1">
+                  <Navbar />
+                  <div className="p-0">
+                    <Routes>
+                      <Route path="/" element={<Index />} />
+                      <Route path="/budgeting" element={<Budgeting />} />
+                      <Route path="/add-budget" element={<AddBudget />} />
+                      <Route path="/spending" element={<SpendingTracker />} />
+                      <Route path="/goals" element={<Goals />} />
+                      <Route path="/education" element={<Education />} />
+                      <Route path="/challenge" element={<Challenge />} />
+                      <Route path="/profile" element={<Profile />} />
+                      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
+                  </div>
+                </main>
               </div>
-            </main>
-          </div>
-        </SidebarProvider>
+            </SidebarProvider>
+          } />
+        </Routes>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
