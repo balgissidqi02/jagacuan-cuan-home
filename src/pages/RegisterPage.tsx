@@ -67,10 +67,15 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="max-w-md mx-auto shadow-lg rounded-xl bg-card">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center mb-4">
-            Daftar Akun
+      <Card className="max-w-md mx-auto shadow-lg rounded-xl bg-card border-border">
+        <CardHeader className="text-center">
+          <div className="mb-2">
+            <p className="text-muted-foreground text-sm mb-4">
+              Start your financial journey today 🚀💵
+            </p>
+          </div>
+          <CardTitle className="text-2xl font-bold text-foreground flex items-center justify-center gap-2">
+            ✨ Daftar Akun
           </CardTitle>
         </CardHeader>
         <CardContent className="p-6">
@@ -120,16 +125,16 @@ export default function RegisterPage() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-primary text-primary-foreground py-2 rounded hover:bg-primary/90 disabled:opacity-50"
+              className="w-full"
             >
-              {loading ? "Loading..." : "Daftar"}
+              {loading ? "Loading... ⏳" : "Daftar 🎯"}
             </Button>
           </form>
           
           <p className="text-center text-sm text-muted-foreground mt-4">
-            Sudah punya akun?{" "}
-            <Link to="/login" className="text-primary hover:underline">
-              Login di sini
+            Sudah punya akun? 💡{" "}
+            <Link to="/login" className="text-primary hover:underline font-medium">
+              Login di sini 💰
             </Link>
           </p>
         </CardContent>

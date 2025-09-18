@@ -58,10 +58,15 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="max-w-md mx-auto shadow-lg rounded-xl bg-card">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center mb-4">
-            Masuk Akun
+      <Card className="max-w-md mx-auto shadow-lg rounded-xl bg-card border-border">
+        <CardHeader className="text-center">
+          <div className="mb-2">
+            <p className="text-muted-foreground text-sm mb-4">
+              Welcome back! Ready to track your money moves? 💸📊
+            </p>
+          </div>
+          <CardTitle className="text-2xl font-bold text-foreground flex items-center justify-center gap-2">
+            💰 Masuk Akun
           </CardTitle>
         </CardHeader>
         <CardContent className="p-6">
@@ -97,16 +102,16 @@ export default function LoginPage() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-primary text-primary-foreground py-2 rounded hover:bg-primary/90 disabled:opacity-50"
+              className="w-full"
             >
-              {loading ? "Loading..." : "Masuk"}
+              {loading ? "Loading... ⏳" : "Masuk ✨"}
             </Button>
           </form>
           
           <p className="text-center text-sm text-muted-foreground mt-4">
-            Belum punya akun?{" "}
-            <Link to="/register" className="text-primary hover:underline">
-              Daftar di sini
+            Belum punya akun? 🤔{" "}
+            <Link to="/register" className="text-primary hover:underline font-medium">
+              Daftar di sini 🚀
             </Link>
           </p>
         </CardContent>
