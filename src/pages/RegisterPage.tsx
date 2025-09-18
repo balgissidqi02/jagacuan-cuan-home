@@ -66,79 +66,136 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="max-w-md mx-auto shadow-lg rounded-xl bg-card border-border">
-        <CardHeader className="text-center">
-          <div className="mb-2">
-            <p className="text-muted-foreground text-sm mb-4">
-              Start your financial journey today 🚀💵
+    <div className="min-h-screen bg-background flex">
+      {/* Left side - Illustration */}
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
+        <div 
+          className="w-full h-full flex items-center justify-center"
+          style={{
+            background: 'linear-gradient(135deg, hsl(var(--income) / 0.1), hsl(var(--primary) / 0.1))'
+          }}
+        >
+          <div className="text-center p-12">
+            <div className="text-8xl mb-8">🌳💵</div>
+            <h1 className="text-4xl font-bold text-income mb-4">
+              Grow Your Wealth
+            </h1>
+            <p className="text-xl text-muted-foreground mb-8">
+              Start your journey to financial freedom with smart budgeting and goal tracking
             </p>
+            <div className="flex justify-center space-x-4 text-6xl">
+              <span>🚀</span>
+              <span>💰</span>
+              <span>📈</span>
+            </div>
           </div>
-          <CardTitle className="text-2xl font-bold text-foreground flex items-center justify-center gap-2">
-            ✨ Daftar Akun
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-6">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <Label htmlFor="username">Username</Label>
-              <Input
-                id="username"
-                name="username"
-                type="text"
-                value={formData.username}
-                onChange={handleChange}
-                className="w-full border rounded p-2 mb-3"
-                placeholder="Masukkan username"
-                disabled={loading}
-              />
-            </div>
+        </div>
+      </div>
+
+      {/* Right side - Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
+        <div className="w-full max-w-md">
+          <Card 
+            className="shadow-2xl border-0"
+            style={{
+              boxShadow: '0 20px 40px -12px hsl(var(--income) / 0.15)'
+            }}
+          >
+            <CardHeader className="text-center pb-8">
+              <div className="mb-6">
+                <p className="text-muted-foreground text-base mb-2">
+                  Join now and start your financial journey 🚀💵
+                </p>
+              </div>
+              <CardTitle className="text-3xl font-bold bg-gradient-to-r from-income to-primary bg-clip-text text-transparent">
+                Create Account ✨
+              </CardTitle>
+            </CardHeader>
             
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full border rounded p-2 mb-3"
-                placeholder="Masukkan email"
-                disabled={loading}
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                value={formData.password}
-                onChange={handleChange}
-                className="w-full border rounded p-2 mb-3"
-                placeholder="Masukkan password (min. 6 karakter)"
-                disabled={loading}
-              />
-            </div>
-            
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full"
-            >
-              {loading ? "Loading... ⏳" : "Daftar 🎯"}
-            </Button>
-          </form>
-          
-          <p className="text-center text-sm text-muted-foreground mt-4">
-            Sudah punya akun? 💡{" "}
-            <Link to="/login" className="text-primary hover:underline font-medium">
-              Login di sini 💰
-            </Link>
-          </p>
-        </CardContent>
-      </Card>
+            <CardContent className="px-8 pb-8">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="username" className="text-sm font-medium text-foreground">
+                    Username
+                  </Label>
+                  <Input
+                    id="username"
+                    name="username"
+                    type="text"
+                    value={formData.username}
+                    onChange={handleChange}
+                    className="h-12 rounded-xl border-2 border-border/50 focus:border-income transition-colors"
+                    placeholder="Choose a username"
+                    disabled={loading}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-sm font-medium text-foreground">
+                    Email Address
+                  </Label>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="h-12 rounded-xl border-2 border-border/50 focus:border-income transition-colors"
+                    placeholder="Enter your email"
+                    disabled={loading}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="text-sm font-medium text-foreground">
+                    Password
+                  </Label>
+                  <Input
+                    id="password"
+                    name="password"
+                    type="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="h-12 rounded-xl border-2 border-border/50 focus:border-income transition-colors"
+                    placeholder="Create a password (min. 6 characters)"
+                    disabled={loading}
+                  />
+                </div>
+                
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full h-12 rounded-xl text-base font-semibold transition-all duration-200 transform hover:scale-[1.02]"
+                  style={{
+                    background: 'linear-gradient(135deg, hsl(var(--income)), hsl(var(--income) / 0.8))',
+                    boxShadow: '0 8px 16px -4px hsl(var(--income) / 0.3)'
+                  }}
+                >
+                  {loading ? "Creating Account... ⏳" : "Get Started 🎯"}
+                </Button>
+              </form>
+              
+              <div className="mt-8 text-center">
+                <p className="text-sm text-muted-foreground">
+                  Already have an account?{" "}
+                  <Link 
+                    to="/login" 
+                    className="text-income hover:text-income/80 font-semibold transition-colors"
+                  >
+                    Sign in here 💡
+                  </Link>
+                </p>
+              </div>
+              
+              <div className="mt-8 pt-6 border-t border-border/50 text-center">
+                <p className="text-xs text-muted-foreground/80">
+                  Your money, your future ✨
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   )
 }
