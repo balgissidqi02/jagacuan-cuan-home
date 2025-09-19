@@ -57,6 +57,26 @@ export function AddSpendingForm({ onSuccess, onBack }: AddSpendingFormProps) {
     setLoading(true)
 
     try {
+      // Get current user
+      const { data: { user }, error: userError } = await supabase.auth.getUser()
+      
+      if (userError || !user) {
+        console.error('User not authenticated:', userError)
+        toast.error('Please log in to add transactions')
+        return
+      }
+
+      console.log('Adding transaction:', {
+        type: transactionType,
+        method: 'manual',
+        name: formData.description,
+        amount: parseFloat(formData.amount),
+        category_id: formData.category || null,
+        notes: `Payment: ${formData.paymentMethod}`,
+        date: date.toISOString(),
+        user_id: user.id
+      })
+
       const { data, error } = await supabase.from('transactions').insert({
         type: transactionType,
         method: 'manual',
@@ -65,11 +85,15 @@ export function AddSpendingForm({ onSuccess, onBack }: AddSpendingFormProps) {
         category_id: formData.category || null,
         notes: `Payment: ${formData.paymentMethod}`,
         date: date.toISOString(),
-        user_id: (await supabase.auth.getUser()).data.user?.id
+        user_id: user.id
       })
 
-      if (error) throw error
+      if (error) {
+        console.error('Supabase error:', error)
+        throw error
+      }
 
+      console.log('Transaction added successfully:', data)
       toast.success(`${transactionType === 'spending' ? 'Spending' : 'Income'} added successfully!`)
       onSuccess()
     } catch (error) {
