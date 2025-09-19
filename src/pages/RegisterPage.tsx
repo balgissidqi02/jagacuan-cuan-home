@@ -71,8 +71,8 @@ export default function RegisterPage() {
       }
 
       console.log('Registration data:', data)
-      toast.success("Registrasi berhasil, silakan login")
-      navigate('/login')
+      toast.success("Registrasi berhasil! Selamat datang!")
+      navigate('/')
     } catch (error: any) {
       console.error('Registration error:', error)
       toast.error(error.message || "Terjadi kesalahan saat registrasi")
