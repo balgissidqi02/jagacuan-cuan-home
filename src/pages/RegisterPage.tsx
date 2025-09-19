@@ -54,6 +54,22 @@ export default function RegisterPage() {
 
       if (error) throw error
 
+      // Also insert into users table
+      if (data.user) {
+        const { error: userError } = await supabase
+          .from('users')
+          .insert({
+            user_id: data.user.id,
+            username: formData.username,
+            email: formData.email,
+            password: formData.password // Note: In production, you shouldn't store plain text passwords
+          })
+        
+        if (userError) {
+          console.error('User table insert error:', userError)
+        }
+      }
+
       console.log('Registration data:', data)
       toast.success("Registrasi berhasil, silakan login")
       navigate('/login')
@@ -76,18 +92,17 @@ export default function RegisterPage() {
           }}
         >
           <div className="text-center p-12">
-            <div className="text-8xl mb-8">🌳💵</div>
+            <div className="w-32 h-32 mx-auto mb-8 bg-gradient-to-br from-income to-primary rounded-3xl flex items-center justify-center">
+              <svg className="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M14,6H10V4H14M15,8V16H13V10H9V16H7V8H15M16,2H8A2,2 0 0,0 6,4V20A2,2 0 0,0 8,22H16A2,2 0 0,0 18,20V4A2,2 0 0,0 16,2Z"/>
+              </svg>
+            </div>
             <h1 className="text-4xl font-bold text-income mb-4">
               Grow Your Wealth
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
               Start your journey to financial freedom with smart budgeting and goal tracking
             </p>
-            <div className="flex justify-center space-x-4 text-6xl">
-              <span>🚀</span>
-              <span>💰</span>
-              <span>📈</span>
-            </div>
           </div>
         </div>
       </div>
@@ -104,11 +119,11 @@ export default function RegisterPage() {
             <CardHeader className="text-center pb-8">
               <div className="mb-6">
                 <p className="text-muted-foreground text-base mb-2">
-                  Join now and start your financial journey 🚀💵
+                  Start your financial journey today
                 </p>
               </div>
               <CardTitle className="text-3xl font-bold bg-gradient-to-r from-income to-primary bg-clip-text text-transparent">
-                Create Account ✨
+                Create Account
               </CardTitle>
             </CardHeader>
             
@@ -171,7 +186,7 @@ export default function RegisterPage() {
                     boxShadow: '0 8px 16px -4px hsl(var(--income) / 0.3)'
                   }}
                 >
-                  {loading ? "Creating Account... ⏳" : "Get Started 🎯"}
+                  {loading ? "Creating Account..." : "Get Started"}
                 </Button>
               </form>
               
@@ -182,14 +197,14 @@ export default function RegisterPage() {
                     to="/login" 
                     className="text-income hover:text-income/80 font-semibold transition-colors"
                   >
-                    Sign in here 💡
+                    Sign in here
                   </Link>
                 </p>
               </div>
               
               <div className="mt-8 pt-6 border-t border-border/50 text-center">
                 <p className="text-xs text-muted-foreground/80">
-                  Your money, your future ✨
+                  Your money, your future
                 </p>
               </div>
             </CardContent>

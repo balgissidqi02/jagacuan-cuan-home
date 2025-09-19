@@ -2,6 +2,7 @@ import { useState } from "react"
 import { FloatingActionButton } from "@/components/FloatingActionButton"
 import { TransactionList } from "@/components/TransactionList"
 import { TransactionModal } from "@/components/TransactionModal"
+import { AddSpendingForm } from "@/components/AddSpendingForm"
 
 export type TransactionType = 'income' | 'spending'
 export type TransactionMethod = 'manual' | 'photo'
@@ -19,12 +20,13 @@ export interface TransactionData {
 
 const Spending = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [showAddForm, setShowAddForm] = useState(false)
   const [transactionType, setTransactionType] = useState<TransactionType>('spending')
   const [refreshTrigger, setRefreshTrigger] = useState(0)
 
   const handleFabClick = (type: TransactionType) => {
     setTransactionType(type)
-    setIsModalOpen(true)
+    setShowAddForm(true)
   }
 
   const handleModalClose = () => {
@@ -34,6 +36,20 @@ const Spending = () => {
   const handleTransactionSuccess = () => {
     setRefreshTrigger(prev => prev + 1)
     setIsModalOpen(false)
+    setShowAddForm(false)
+  }
+
+  const handleBackFromForm = () => {
+    setShowAddForm(false)
+  }
+
+  if (showAddForm) {
+    return (
+      <AddSpendingForm 
+        onSuccess={handleTransactionSuccess}
+        onBack={handleBackFromForm}
+      />
+    )
   }
 
   return (

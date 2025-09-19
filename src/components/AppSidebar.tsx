@@ -1,5 +1,7 @@
-import { Home, Wallet, TrendingDown, Target, Trophy, GraduationCap, User } from "lucide-react"
-import { NavLink, useLocation } from "react-router-dom"
+import { Home, Wallet, TrendingDown, Target, Trophy, GraduationCap, User, LogOut } from "lucide-react"
+import { NavLink, useLocation, useNavigate } from "react-router-dom"
+import { supabase } from "@/integrations/supabase/client"
+import { toast } from "sonner"
 
 import {
   Sidebar,
@@ -11,6 +13,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarHeader,
+  SidebarFooter,
   useSidebar,
 } from "@/components/ui/sidebar"
 
@@ -27,12 +30,26 @@ const items = [
 export function AppSidebar() {
   const { state } = useSidebar()
   const location = useLocation()
+  const navigate = useNavigate()
   const currentPath = location.pathname
   const collapsed = state === "collapsed"
 
   const isActive = (path: string) => currentPath === path
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
     isActive ? "bg-primary text-primary-foreground font-medium" : "hover:bg-accent hover:text-accent-foreground"
+
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut()
+      if (error) throw error
+      
+      toast.success("Logged out successfully")
+      navigate('/login')
+    } catch (error) {
+      console.error('Logout error:', error)
+      toast.error("Failed to logout")
+    }
+  }
 
   return (
     <Sidebar
@@ -68,17 +85,28 @@ export function AppSidebar() {
                       to={item.url} 
                       end 
                       className={({ isActive }) => getNavCls({ isActive })}
-                    >
-                      <item.icon className="h-4 w-4" />
-                      {!collapsed && <span>{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-    </Sidebar>
+                     >
+                       <item.icon className="h-4 w-4" />
+                       {!collapsed && <span>{item.title}</span>}
+                     </NavLink>
+                   </SidebarMenuButton>
+                 </SidebarMenuItem>
+               ))}
+             </SidebarMenu>
+           </SidebarGroupContent>
+         </SidebarGroup>
+       </SidebarContent>
+
+       <SidebarFooter className="p-4 border-t">
+         <SidebarMenu>
+           <SidebarMenuItem>
+             <SidebarMenuButton onClick={handleLogout} className="text-destructive hover:text-destructive hover:bg-destructive/10">
+               <LogOut className="h-4 w-4" />
+               {!collapsed && <span>Logout</span>}
+             </SidebarMenuButton>
+           </SidebarMenuItem>
+         </SidebarMenu>
+       </SidebarFooter>
+     </Sidebar>
   )
 }

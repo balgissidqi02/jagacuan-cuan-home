@@ -95,11 +95,11 @@ export default function LoginPage() {
             <CardHeader className="text-center pb-8">
               <div className="mb-6">
                 <p className="text-muted-foreground text-base mb-2">
-                  Welcome back! Ready to grow your savings? 💰
+                  Welcome back! Ready to grow your savings?
                 </p>
               </div>
               <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary to-income bg-clip-text text-transparent">
-                Sign In ✨
+                Sign In
               </CardTitle>
             </CardHeader>
             
@@ -146,7 +146,7 @@ export default function LoginPage() {
                     boxShadow: '0 8px 16px -4px hsl(var(--primary) / 0.3)'
                   }}
                 >
-                  {loading ? "Signing In... ⏳" : "Sign In 🚀"}
+                  {loading ? "Signing In..." : "Sign In"}
                 </Button>
               </form>
               
@@ -157,14 +157,14 @@ export default function LoginPage() {
                     to="/register" 
                     className="text-primary hover:text-primary/80 font-semibold transition-colors"
                   >
-                    Create one here 💡
+                    Create one here
                   </Link>
                 </p>
               </div>
               
               <div className="mt-8 pt-6 border-t border-border/50 text-center">
                 <p className="text-xs text-muted-foreground/80">
-                  Your money, your future ✨
+                  Your money, your future
                 </p>
               </div>
             </CardContent>
