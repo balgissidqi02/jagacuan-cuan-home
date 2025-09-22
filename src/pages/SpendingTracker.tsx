@@ -38,36 +38,53 @@ export default function SpendingTracker() {
   })
   const [loading, setLoading] = useState(true)
 
-  // Mock user ID for demo - in real app this would come from auth
-  const userId = "123e4567-e89b-12d3-a456-426614174000"
+  // Get user from auth
+  const [userId, setUserId] = useState<string | null>(null)
 
   useEffect(() => {
-    fetchData()
-    
-    // Setup realtime subscriptions
-    const spendingChannel = supabase
-      .channel('spending-changes')
-      .on('postgres_changes', 
-        { event: '*', schema: 'public', table: 'spending_tracker' },
-        () => fetchData()
-      )
-      .subscribe()
-
-    const budgetChannel = supabase
-      .channel('budget-changes')
-      .on('postgres_changes', 
-        { event: '*', schema: 'public', table: 'budgeting' },
-        () => fetchData()
-      )
-      .subscribe()
-
-    return () => {
-      supabase.removeChannel(spendingChannel)
-      supabase.removeChannel(budgetChannel)
-    }
+    getCurrentUser()
   }, [])
 
+  useEffect(() => {
+    if (userId) {
+      fetchData()
+      
+      // Setup realtime subscriptions
+      const spendingChannel = supabase
+        .channel('spending-changes')
+        .on('postgres_changes', 
+          { event: '*', schema: 'public', table: 'spending_tracker' },
+          () => fetchData()
+        )
+        .subscribe()
+
+      const budgetChannel = supabase
+        .channel('budget-changes')
+        .on('postgres_changes', 
+          { event: '*', schema: 'public', table: 'budgeting' },
+          () => fetchData()
+        )
+        .subscribe()
+
+      return () => {
+        supabase.removeChannel(spendingChannel)
+        supabase.removeChannel(budgetChannel)
+      }
+    }
+  }, [userId])
+
+  const getCurrentUser = async () => {
+    const { data: { user }, error } = await supabase.auth.getUser()
+    if (error || !user) {
+      console.error('User not authenticated:', error)
+      return
+    }
+    setUserId(user.id)
+  }
+
   const fetchData = async () => {
+    if (!userId) return
+    
     try {
       // Fetch budgets
       const { data: budgetsData, error: budgetsError } = await supabase

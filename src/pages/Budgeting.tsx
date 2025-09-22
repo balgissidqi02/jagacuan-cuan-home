@@ -14,6 +14,7 @@ interface Budget {
   amount: number
   spent: number
   user_id: string
+  notes?: string
 }
 
 const categoryColors = {
@@ -31,27 +32,44 @@ export default function Budgeting() {
   const [budgets, setBudgets] = useState<Budget[]>([])
   const [loading, setLoading] = useState(true)
 
-  // Mock user ID for demo - in real app this would come from auth
-  const userId = "123e4567-e89b-12d3-a456-426614174000"
+  // Get user from auth
+  const [userId, setUserId] = useState<string | null>(null)
 
   useEffect(() => {
-    fetchBudgets()
-    
-    // Setup realtime subscription
-    const channel = supabase
-      .channel('budgeting-changes')
-      .on('postgres_changes', 
-        { event: '*', schema: 'public', table: 'budgeting' },
-        () => fetchBudgets()
-      )
-      .subscribe()
-
-    return () => {
-      supabase.removeChannel(channel)
-    }
+    getCurrentUser()
   }, [])
 
+  useEffect(() => {
+    if (userId) {
+      fetchBudgets()
+      
+      // Setup realtime subscription
+      const channel = supabase
+        .channel('budgeting-changes')
+        .on('postgres_changes', 
+          { event: '*', schema: 'public', table: 'budgeting' },
+          () => fetchBudgets()
+        )
+        .subscribe()
+
+      return () => {
+        supabase.removeChannel(channel)
+      }
+    }
+  }, [userId])
+
+  const getCurrentUser = async () => {
+    const { data: { user }, error } = await supabase.auth.getUser()
+    if (error || !user) {
+      navigate('/login')
+      return
+    }
+    setUserId(user.id)
+  }
+
   const fetchBudgets = async () => {
+    if (!userId) return
+    
     try {
       const { data, error } = await supabase
         .from('budgeting')
@@ -150,7 +168,12 @@ export default function Budgeting() {
             <Card key={budget.id} className="rounded-2xl shadow-soft">
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
-                  <span className="text-lg font-semibold">{budget.category}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg font-semibold">{budget.category}</span>
+                    {budget.notes && (
+                      <span className="text-sm text-muted-foreground">({budget.notes})</span>
+                    )}
+                  </div>
                   <div className={`w-4 h-4 rounded-full ${colorClass}`}></div>
                 </CardTitle>
               </CardHeader>

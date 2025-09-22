@@ -11,7 +11,7 @@ import Budgeting from "./pages/Budgeting";
 import AddBudget from "./pages/AddBudget";
 import Spending from "./pages/Spending";
 import SpendingTracker from "./pages/SpendingTracker";
-import Goals from "./pages/Goals";
+import GoalsWithCustomCategories from "./pages/GoalsWithCustomCategories";
 import Education from "./pages/Education";
 import Challenge from "./pages/Challenge";
 import Profile from "./pages/Profile";
@@ -45,7 +45,7 @@ const App = () => (
                       <Route path="/budgeting" element={<Budgeting />} />
                       <Route path="/add-budget" element={<AddBudget />} />
                       <Route path="/spending" element={<SpendingTracker />} />
-                      <Route path="/goals" element={<Goals />} />
+                      <Route path="/goals" element={<GoalsWithCustomCategories />} />
                       <Route path="/education" element={<Education />} />
                       <Route path="/challenge" element={<Challenge />} />
                       <Route path="/profile" element={<Profile />} />

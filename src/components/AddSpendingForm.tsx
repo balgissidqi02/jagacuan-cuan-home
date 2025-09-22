@@ -107,60 +107,63 @@ export function AddSpendingForm({ onSuccess, onBack }: AddSpendingFormProps) {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b bg-card">
-        <Button variant="ghost" size="sm" onClick={onBack}>
+      <div className="flex items-center justify-between p-6 border-b bg-card/50 backdrop-blur-sm">
+        <Button variant="ghost" size="sm" onClick={onBack} className="rounded-full">
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <h1 className="text-lg font-semibold">Add Spending</h1>
+        <h1 className="text-xl font-bold text-foreground">Add Transaction</h1>
         <Button 
           type="submit" 
           form="spending-form"
           variant="ghost" 
           size="sm"
           disabled={loading}
+          className="rounded-full bg-primary/10 text-primary hover:bg-primary/20"
         >
           <Check className="h-4 w-4" />
         </Button>
       </div>
 
       {/* Content */}
-      <div className="p-4 space-y-6">
+      <div className="p-6 space-y-8 bg-gradient-to-b from-background to-muted/20">
         {/* Toggle */}
-        <div className="flex rounded-lg border p-1 bg-muted">
-          <button
-            type="button"
-            onClick={() => setTransactionType('spending')}
-            className={cn(
-              "flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-md text-sm font-medium transition-colors",
-              transactionType === 'spending' 
-                ? "bg-expense text-expense-foreground shadow-sm" 
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            <ArrowDown className="h-4 w-4" />
-            Spending
-          </button>
-          <button
-            type="button"
-            onClick={() => setTransactionType('income')}
-            className={cn(
-              "flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-md text-sm font-medium transition-colors",
-              transactionType === 'income' 
-                ? "bg-income text-income-foreground shadow-sm" 
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            <ArrowUp className="h-4 w-4" />
-            Income
-          </button>
+        <div className="bg-card rounded-2xl p-2 shadow-sm border">
+          <div className="flex rounded-xl bg-muted/50 p-1">
+            <button
+              type="button"
+              onClick={() => setTransactionType('spending')}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-lg text-sm font-semibold transition-all duration-200",
+                transactionType === 'spending' 
+                  ? "bg-expense text-expense-foreground shadow-lg scale-105" 
+                  : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+              )}
+            >
+              <ArrowDown className="h-4 w-4" />
+              Spending
+            </button>
+            <button
+              type="button"
+              onClick={() => setTransactionType('income')}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-lg text-sm font-semibold transition-all duration-200",
+                transactionType === 'income' 
+                  ? "bg-income text-income-foreground shadow-lg scale-105" 
+                  : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+              )}
+            >
+              <ArrowUp className="h-4 w-4" />
+              Income
+            </button>
+          </div>
         </div>
 
-        <form id="spending-form" onSubmit={handleSubmit} className="space-y-6">
+        <form id="spending-form" onSubmit={handleSubmit} className="space-y-8">
           {/* Amount */}
-          <div className="space-y-2">
-            <Label htmlFor="amount">Amount</Label>
+          <div className="bg-card rounded-2xl p-6 shadow-sm border space-y-4">
+            <Label htmlFor="amount" className="text-base font-semibold text-foreground">Amount</Label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">
                 RP
               </span>
               <Input
@@ -169,7 +172,7 @@ export function AddSpendingForm({ onSuccess, onBack }: AddSpendingFormProps) {
                 value={formData.amount}
                 onChange={(e) => setFormData(prev => ({ ...prev, amount: e.target.value }))}
                 placeholder="0"
-                className="pl-12 h-12 text-lg"
+                className="pl-16 h-16 text-2xl font-bold border-0 bg-muted/50 rounded-xl focus:ring-2 focus:ring-primary/20"
                 required
                 min="0"
                 step="0.01"
@@ -178,53 +181,54 @@ export function AddSpendingForm({ onSuccess, onBack }: AddSpendingFormProps) {
           </div>
 
           {/* Category */}
-          <div className="space-y-2">
-            <Label>Category</Label>
-            <div className="grid grid-cols-2 gap-3">
+          <div className="bg-card rounded-2xl p-6 shadow-sm border space-y-4">
+            <Label className="text-base font-semibold text-foreground">Category</Label>
+            <div className="grid grid-cols-2 gap-4">
               {categories.map((category) => (
                 <button
                   key={category.id}
                   type="button"
                   onClick={() => setFormData(prev => ({ ...prev, category: category.id }))}
                   className={cn(
-                    "flex items-center gap-3 p-4 rounded-lg border transition-colors",
+                    "flex items-center gap-3 p-4 rounded-xl border-2 transition-all duration-200 hover:scale-105",
                     formData.category === category.id
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:bg-accent"
+                      ? "border-primary bg-primary/10 shadow-lg scale-105"
+                      : "border-border hover:bg-accent hover:border-accent-foreground/20"
                   )}
                 >
-                  <span className="text-2xl">{category.icon}</span>
-                  <span className="font-medium">{category.name}</span>
+                  <span className="text-3xl">{category.icon}</span>
+                  <span className="font-semibold text-sm">{category.name}</span>
                 </button>
               ))}
             </div>
           </div>
 
           {/* Description */}
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+          <div className="bg-card rounded-2xl p-6 shadow-sm border space-y-4">
+            <Label htmlFor="description" className="text-base font-semibold text-foreground">Description</Label>
             <Input
               id="description"
               value={formData.description}
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
               placeholder="e.g., Lunch at Canteen"
+              className="h-12 border-0 bg-muted/50 rounded-xl text-base"
               required
             />
           </div>
 
           {/* Date */}
-          <div className="space-y-2">
-            <Label>Date</Label>
+          <div className="bg-card rounded-2xl p-6 shadow-sm border space-y-4">
+            <Label className="text-base font-semibold text-foreground">Date</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
                   className={cn(
-                    "w-full justify-start text-left font-normal h-12",
+                    "w-full justify-start text-left font-normal h-12 border-0 bg-muted/50 rounded-xl",
                     !date && "text-muted-foreground"
                   )}
                 >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  <CalendarIcon className="mr-3 h-4 w-4" />
                   {date ? format(date, "PPP") : <span>Pick a date</span>}
                 </Button>
               </PopoverTrigger>
@@ -241,10 +245,10 @@ export function AddSpendingForm({ onSuccess, onBack }: AddSpendingFormProps) {
           </div>
 
           {/* Payment Method */}
-          <div className="space-y-2">
-            <Label htmlFor="payment-method">Payment Method</Label>
+          <div className="bg-card rounded-2xl p-6 shadow-sm border space-y-4">
+            <Label htmlFor="payment-method" className="text-base font-semibold text-foreground">Payment Method</Label>
             <Select value={formData.paymentMethod} onValueChange={(value) => setFormData(prev => ({ ...prev, paymentMethod: value }))}>
-              <SelectTrigger className="h-12">
+              <SelectTrigger className="h-12 border-0 bg-muted/50 rounded-xl">
                 <SelectValue placeholder="Select payment method" />
               </SelectTrigger>
               <SelectContent>
@@ -261,7 +265,7 @@ export function AddSpendingForm({ onSuccess, onBack }: AddSpendingFormProps) {
           <Button
             type="submit"
             disabled={loading}
-            className="w-full h-12 text-base font-semibold rounded-xl bg-primary hover:bg-primary/90"
+            className="w-full h-16 text-lg font-bold rounded-2xl bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
           >
             {loading ? 'Saving...' : 'Save Transaction'}
           </Button>
