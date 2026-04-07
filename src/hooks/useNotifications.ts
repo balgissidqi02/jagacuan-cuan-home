@@ -1,4 +1,5 @@
 import { useEffect, useCallback, useRef } from "react"
+import { useNavigate } from "react-router-dom"
 import { supabase } from "@/integrations/supabase/client"
 import { toast } from "sonner"
 
@@ -7,6 +8,7 @@ const NOTIFICATION_PERMISSION_KEY = "jagacuan_notif_permission_asked"
 
 export function useNotifications() {
   const budgetCheckInterval = useRef<ReturnType<typeof setInterval> | null>(null)
+  const navigate = useNavigate()
 
   const requestPermission = useCallback(async () => {
     if (!("Notification" in window)) return false
@@ -21,13 +23,20 @@ export function useNotifications() {
     return permission === "granted"
   }, [])
 
-  const sendBrowserNotification = useCallback((title: string, body: string) => {
+  const sendBrowserNotification = useCallback((title: string, body: string, onClick?: () => void) => {
     if ("Notification" in window && Notification.permission === "granted") {
-      new Notification(title, {
+      const notif = new Notification(title, {
         body,
         icon: "/favicon.ico",
         badge: "/favicon.ico",
       })
+      if (onClick) {
+        notif.onclick = () => {
+          window.focus()
+          onClick()
+          notif.close()
+        }
+      }
     }
   }, [])
 
@@ -38,19 +47,22 @@ export function useNotifications() {
     if (lastReminder !== today) {
       localStorage.setItem(REMINDER_KEY, today)
       
-      // In-app toast
       toast("📊 Reminder Harian", {
         description: "Jangan lupa catat pengeluaran dan pendapatanmu hari ini di JagaCuan!",
         duration: 8000,
+        action: {
+          label: "Catat Sekarang",
+          onClick: () => navigate("/spending"),
+        },
       })
 
-      // Browser notification
       sendBrowserNotification(
         "📊 JagaCuan Reminder",
-        "Jangan lupa catat pengeluaran dan pendapatanmu hari ini!"
+        "Jangan lupa catat pengeluaran dan pendapatanmu hari ini!",
+        () => navigate("/spending")
       )
     }
-  }, [sendBrowserNotification])
+  }, [sendBrowserNotification, navigate])
 
   const checkBudgetExceeded = useCallback(async () => {
     try {
@@ -79,31 +91,31 @@ export function useNotifications() {
           const overAmount = (budget.spent ?? 0) - budget.amount
           const message = `Budget "${budget.category}" sudah melebihi batas! Over sebesar Rp ${overAmount.toLocaleString("id-ID")}`
 
-          // In-app toast
           toast.warning("⚠️ Budget Exceeded!", {
             description: message,
             duration: 10000,
+            action: {
+              label: "Lihat Budget",
+              onClick: () => navigate("/budgeting"),
+            },
           })
 
-          // Browser notification
-          sendBrowserNotification("⚠️ Budget Exceeded!", message)
+          sendBrowserNotification("⚠️ Budget Exceeded!", message, () => navigate("/budgeting"))
         }
       }
     } catch (error) {
       console.error("Error checking budget:", error)
     }
-  }, [sendBrowserNotification])
+  }, [sendBrowserNotification, navigate])
 
   useEffect(() => {
     requestPermission()
     
-    // Small delay so app loads first
     const timer = setTimeout(() => {
       checkDailyReminder()
       checkBudgetExceeded()
     }, 2000)
 
-    // Check budget every 5 minutes
     budgetCheckInterval.current = setInterval(checkBudgetExceeded, 5 * 60 * 1000)
 
     return () => {
