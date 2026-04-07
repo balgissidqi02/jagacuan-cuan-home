@@ -51,6 +51,47 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: "budgeting_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      budgeting_history: {
+        Row: {
+          amount_changed: number
+          budget_id: string
+          created_at: string
+          history_id: string
+          new_spent: number
+          notes: string | null
+          previous_spent: number
+          user_id: string
+        }
+        Insert: {
+          amount_changed: number
+          budget_id: string
+          created_at?: string
+          history_id?: string
+          new_spent: number
+          notes?: string | null
+          previous_spent: number
+          user_id: string
+        }
+        Update: {
+          amount_changed?: number
+          budget_id?: string
+          created_at?: string
+          history_id?: string
+          new_spent?: number
+          notes?: string | null
+          previous_spent?: number
+          user_id?: string
+        }
         Relationships: []
       }
       categories: {
@@ -74,6 +115,42 @@ export type Database = {
           deleted_at?: string | null
           name?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      default_challenges: {
+        Row: {
+          created_at: string | null
+          deleted_at: string | null
+          description: string
+          end_date: string | null
+          id: string
+          reward_points: number | null
+          start_date: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          deleted_at?: string | null
+          description: string
+          end_date?: string | null
+          id?: string
+          reward_points?: number | null
+          start_date?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          deleted_at?: string | null
+          description?: string
+          end_date?: string | null
+          id?: string
+          reward_points?: number | null
+          start_date?: string | null
+          title?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -182,26 +259,32 @@ export type Database = {
       }
       profiles: {
         Row: {
+          bio: string | null
           created_at: string
           deleted_at: string | null
           id: string
           name: string | null
+          photo_url: string | null
           role: string | null
           updated_at: string
         }
         Insert: {
+          bio?: string | null
           created_at?: string
           deleted_at?: string | null
           id: string
           name?: string | null
+          photo_url?: string | null
           role?: string | null
           updated_at?: string
         }
         Update: {
+          bio?: string | null
           created_at?: string
           deleted_at?: string | null
           id?: string
           name?: string | null
+          photo_url?: string | null
           role?: string | null
           updated_at?: string
         }
@@ -319,6 +402,47 @@ export type Database = {
           },
         ]
       }
+      saving_goals_history: {
+        Row: {
+          amount_added: number
+          created_at: string
+          goal_id: string
+          history_id: string
+          new_amount: number
+          notes: string | null
+          previous_amount: number
+          user_id: string
+        }
+        Insert: {
+          amount_added: number
+          created_at?: string
+          goal_id: string
+          history_id?: string
+          new_amount: number
+          notes?: string | null
+          previous_amount: number
+          user_id: string
+        }
+        Update: {
+          amount_added?: number
+          created_at?: string
+          goal_id?: string
+          history_id?: string
+          new_amount?: number
+          notes?: string | null
+          previous_amount?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saving_goals_history_goal_id_fkey"
+            columns: ["goal_id"]
+            isOneToOne: false
+            referencedRelation: "saving_goals"
+            referencedColumns: ["goal_id"]
+          },
+        ]
+      }
       spending_tracker: {
         Row: {
           amount: number
@@ -328,7 +452,9 @@ export type Database = {
           deleted_at: string | null
           description: string
           id: string
+          income: number | null
           updated_at: string | null
+          user_id: string
         }
         Insert: {
           amount: number
@@ -338,7 +464,9 @@ export type Database = {
           deleted_at?: string | null
           description: string
           id?: string
+          income?: number | null
           updated_at?: string | null
+          user_id: string
         }
         Update: {
           amount?: number
@@ -348,7 +476,9 @@ export type Database = {
           deleted_at?: string | null
           description?: string
           id?: string
+          income?: number | null
           updated_at?: string | null
+          user_id?: string
         }
         Relationships: [
           {
@@ -357,6 +487,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "budgeting"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "spending_tracker_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["user_id"]
           },
         ]
       }
@@ -411,6 +548,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       users: {
         Row: {
           created_at: string
@@ -446,9 +604,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
+      app_role: "admin" | "user"
       budgeting_period: "weekly" | "monthly"
       category_type: "spending" | "budgeting"
       edu_type: "video" | "quiz" | "daily_tips"
@@ -582,6 +747,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["admin", "user"],
       budgeting_period: ["weekly", "monthly"],
       category_type: ["spending", "budgeting"],
       edu_type: ["video", "quiz", "daily_tips"],
