@@ -55,6 +55,7 @@ const App = () => (
                       <Route path="*" element={<NotFound />} />
                     </Routes>
                   </div>
+                  </NotificationProvider>
                 </main>
               </div>
             </SidebarProvider>
