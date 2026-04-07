@@ -1,16 +1,17 @@
-import { useState, useEffect } from "react"
-import { GraduationCap, Wallet, PiggyBank, TrendingUp, Lightbulb, ChevronRight, BookOpen, Star } from "lucide-react"
+import { useState, useEffect, useRef } from "react"
+import { GraduationCap, Wallet, PiggyBank, TrendingUp, Lightbulb, ChevronRight, BookOpen, Star, Play, Upload, X } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { AspectRatio } from "@/components/ui/aspect-ratio"
 import { supabase } from "@/integrations/supabase/client"
 
-interface EducationArticle {
+interface EducationVideo {
   id: string
   title: string
-  content: string
+  description: string
+  videoUrl: string
   category: string
-  icon: React.ReactNode
   isFromDb?: boolean
 }
 
@@ -21,83 +22,73 @@ const categoryConfig: Record<string, { label: string; icon: React.ReactNode; col
   lainnya: { label: "Tips & Lainnya", icon: <Lightbulb className="h-5 w-5" />, color: "bg-warning/10 text-warning" },
 }
 
-const defaultArticles: EducationArticle[] = [
+function getYouTubeId(url: string): string | null {
+  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&?\s]{11})/)
+  return match ? match[1] : null
+}
+
+function isYouTubeUrl(url: string): boolean {
+  return /youtu\.?be/.test(url)
+}
+
+const defaultVideos: EducationVideo[] = [
   // Pengelolaan Keuangan
-  {
-    id: "k1", category: "keuangan", icon: <Wallet className="h-5 w-5" />,
-    title: "Aturan 50/30/20 untuk Mengelola Gaji",
-    content: "Metode 50/30/20 membagi penghasilan menjadi 3 bagian: 50% untuk kebutuhan pokok (makan, transportasi, tagihan), 30% untuk keinginan (hiburan, belanja), dan 20% untuk tabungan & investasi. Mulai terapkan dari gaji bulan ini!"
-  },
-  {
-    id: "k2", category: "keuangan", icon: <Wallet className="h-5 w-5" />,
-    title: "Cara Membuat Anggaran Bulanan",
-    content: "Langkah pertama adalah mencatat semua sumber pendapatan. Kemudian list semua pengeluaran tetap (sewa, listrik, dll) dan variabel (makan, transport). Sisihkan dana darurat minimal 10%. Gunakan fitur Budgeting di JagaCuan untuk tracking otomatis!"
-  },
-  {
-    id: "k3", category: "keuangan", icon: <Wallet className="h-5 w-5" />,
-    title: "Menghindari Lifestyle Inflation",
-    content: "Lifestyle inflation terjadi ketika pengeluaran meningkat seiring kenaikan pendapatan. Tips mengatasinya: tetapkan persentase tabungan sebelum menghabiskan, tunggu 24 jam sebelum pembelian impulsif, dan selalu evaluasi kebutuhan vs keinginan."
-  },
+  { id: "k1", category: "keuangan", title: "Aturan 50/30/20 untuk Mengelola Gaji", videoUrl: "https://www.youtube.com/watch?v=HQzoZfc3GwQ", description: "Metode 50/30/20 membagi penghasilan menjadi 3 bagian: 50% untuk kebutuhan pokok (makan, transportasi, tagihan), 30% untuk keinginan (hiburan, belanja), dan 20% untuk tabungan & investasi." },
+  { id: "k2", category: "keuangan", title: "Cara Membuat Anggaran Bulanan", videoUrl: "https://www.youtube.com/watch?v=sVKQn2I4HDM", description: "Langkah pertama adalah mencatat semua sumber pendapatan. Kemudian list semua pengeluaran tetap dan variabel. Sisihkan dana darurat minimal 10%." },
+  { id: "k3", category: "keuangan", title: "Menghindari Lifestyle Inflation", videoUrl: "https://www.youtube.com/watch?v=kMiBTPoIhSg", description: "Lifestyle inflation terjadi ketika pengeluaran meningkat seiring kenaikan pendapatan. Tips: tetapkan persentase tabungan, tunggu 24 jam sebelum pembelian impulsif." },
   // Tabungan
-  {
-    id: "t1", category: "tabungan", icon: <PiggyBank className="h-5 w-5" />,
-    title: "Pentingnya Dana Darurat",
-    content: "Dana darurat idealnya 3-6 bulan pengeluaran. Simpan di rekening terpisah yang mudah diakses tapi tidak terlalu mudah digunakan. Dana ini melindungi dari PHK, sakit, atau keadaan darurat lainnya. Mulai dari Rp 100.000/bulan!"
-  },
-  {
-    id: "t2", category: "tabungan", icon: <PiggyBank className="h-5 w-5" />,
-    title: "Challenge Menabung 52 Minggu",
-    content: "Minggu pertama tabung Rp 10.000, minggu kedua Rp 20.000, dan seterusnya. Di akhir tahun, kamu akan memiliki Rp 13.780.000! Alternatif: mulai dari minggu ke-52 (Rp 520.000) dan turun, sehingga lebih mudah di akhir tahun."
-  },
-  {
-    id: "t3", category: "tabungan", icon: <PiggyBank className="h-5 w-5" />,
-    title: "Automasi Tabungan dengan Auto-Debit",
-    content: "Atur auto-debit di hari gajian untuk langsung memindahkan sebagian ke rekening tabungan. Prinsipnya: 'Pay yourself first' - bayar dirimu (tabungan) sebelum membayar yang lain. Ini cara paling efektif untuk konsisten menabung."
-  },
+  { id: "t1", category: "tabungan", title: "Pentingnya Dana Darurat", videoUrl: "https://www.youtube.com/watch?v=EW-XPUXHjOk", description: "Dana darurat idealnya 3-6 bulan pengeluaran. Simpan di rekening terpisah. Dana ini melindungi dari PHK, sakit, atau keadaan darurat lainnya." },
+  { id: "t2", category: "tabungan", title: "Challenge Menabung 52 Minggu", videoUrl: "https://www.youtube.com/watch?v=vr4J8QLuesI", description: "Minggu pertama tabung Rp 10.000, minggu kedua Rp 20.000, dan seterusnya. Di akhir tahun, kamu akan memiliki Rp 13.780.000!" },
+  { id: "t3", category: "tabungan", title: "Automasi Tabungan dengan Auto-Debit", videoUrl: "https://www.youtube.com/watch?v=yAvGBQMPVMY", description: "Atur auto-debit di hari gajian untuk langsung memindahkan sebagian ke rekening tabungan. Prinsipnya: 'Pay yourself first'." },
   // Investasi
-  {
-    id: "i1", category: "investasi", icon: <TrendingUp className="h-5 w-5" />,
-    title: "Investasi untuk Pemula: Mulai dari Mana?",
-    content: "Untuk pemula, mulai dari instrumen low-risk: deposito, reksa dana pasar uang, atau SBN (Surat Berharga Negara). Investasi minimal mulai dari Rp 100.000. Pahami profil risiko kamu dulu sebelum memilih instrumen."
-  },
-  {
-    id: "i2", category: "investasi", icon: <TrendingUp className="h-5 w-5" />,
-    title: "Mengenal Reksa Dana",
-    content: "Reksa dana adalah wadah untuk mengumpulkan dana dari banyak investor yang kemudian dikelola manajer investasi. Jenis: Pasar Uang (low risk), Pendapatan Tetap (medium), Campuran (medium-high), Saham (high). Cocok untuk pemula karena dikelola profesional."
-  },
-  {
-    id: "i3", category: "investasi", icon: <TrendingUp className="h-5 w-5" />,
-    title: "Dollar Cost Averaging (DCA)",
-    content: "DCA adalah strategi investasi rutin dengan jumlah tetap, tanpa memperhatikan harga pasar. Misal: investasi Rp 500.000/bulan di reksa dana. Strategi ini mengurangi risiko timing pasar dan cocok untuk investor jangka panjang."
-  },
+  { id: "i1", category: "investasi", title: "Investasi untuk Pemula: Mulai dari Mana?", videoUrl: "https://www.youtube.com/watch?v=Xn7KWR9EPOS", description: "Untuk pemula, mulai dari instrumen low-risk: deposito, reksa dana pasar uang, atau SBN. Investasi minimal mulai dari Rp 100.000." },
+  { id: "i2", category: "investasi", title: "Mengenal Reksa Dana", videoUrl: "https://www.youtube.com/watch?v=gOCj6bTOE3w", description: "Reksa dana mengumpulkan dana dari banyak investor yang dikelola manajer investasi. Jenis: Pasar Uang, Pendapatan Tetap, Campuran, Saham." },
+  { id: "i3", category: "investasi", title: "Dollar Cost Averaging (DCA)", videoUrl: "https://www.youtube.com/watch?v=ljTfREKboUQ", description: "DCA adalah strategi investasi rutin dengan jumlah tetap. Misal: investasi Rp 500.000/bulan. Mengurangi risiko timing pasar." },
   // Tips Lainnya
-  {
-    id: "l1", category: "lainnya", icon: <Lightbulb className="h-5 w-5" />,
-    title: "Cara Mengatasi Utang dengan Metode Snowball",
-    content: "Bayar utang terkecil dulu sambil membayar minimum untuk utang lainnya. Setelah utang terkecil lunas, alihkan pembayaran ke utang terkecil berikutnya. Metode ini memberikan motivasi karena kamu melihat progres lebih cepat."
-  },
-  {
-    id: "l2", category: "lainnya", icon: <Lightbulb className="h-5 w-5" />,
-    title: "Financial Goals: SMART",
-    content: "Buat tujuan keuangan yang SMART: Specific (spesifik), Measurable (terukur), Achievable (tercapai), Relevant (relevan), Time-bound (ada tenggat). Contoh: 'Menabung Rp 10 juta untuk liburan dalam 6 bulan' lebih baik dari 'Ingin menabung'."
-  },
-  {
-    id: "l3", category: "lainnya", icon: <Lightbulb className="h-5 w-5" />,
-    title: "Pentingnya Asuransi Kesehatan",
-    content: "Asuransi kesehatan melindungi dari biaya medis yang tidak terduga. BPJS Kesehatan adalah asuransi dasar wajib. Pertimbangkan asuransi tambahan jika mampu. Biaya premi jauh lebih kecil dibanding biaya rumah sakit tanpa asuransi."
-  },
+  { id: "l1", category: "lainnya", title: "Cara Mengatasi Utang dengan Metode Snowball", videoUrl: "https://www.youtube.com/watch?v=dJr6PKXB7-c", description: "Bayar utang terkecil dulu sambil membayar minimum untuk utang lainnya. Setelah lunas, alihkan pembayaran ke utang berikutnya." },
+  { id: "l2", category: "lainnya", title: "Financial Goals: SMART", videoUrl: "https://www.youtube.com/watch?v=i0QfCZjASX8", description: "Buat tujuan keuangan SMART: Specific, Measurable, Achievable, Relevant, Time-bound. Contoh: 'Menabung Rp 10 juta dalam 6 bulan'." },
+  { id: "l3", category: "lainnya", title: "Pentingnya Asuransi Kesehatan", videoUrl: "https://www.youtube.com/watch?v=3bDiU2krJSs", description: "Asuransi kesehatan melindungi dari biaya medis tidak terduga. BPJS adalah asuransi dasar wajib. Biaya premi jauh lebih kecil dibanding biaya RS." },
 ]
+
+function VideoPlayer({ url }: { url: string }) {
+  const ytId = getYouTubeId(url)
+
+  if (ytId) {
+    return (
+      <AspectRatio ratio={16 / 9}>
+        <iframe
+          src={`https://www.youtube.com/embed/${ytId}`}
+          title="YouTube video"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          className="w-full h-full rounded-xl"
+        />
+      </AspectRatio>
+    )
+  }
+
+  // Uploaded video (Supabase storage or direct URL)
+  return (
+    <AspectRatio ratio={16 / 9}>
+      <video
+        src={url}
+        controls
+        className="w-full h-full rounded-xl object-cover bg-black"
+      />
+    </AspectRatio>
+  )
+}
 
 export default function Education() {
   const [activeCategory, setActiveCategory] = useState("semua")
   const [expandedId, setExpandedId] = useState<string | null>(null)
-  const [dbArticles, setDbArticles] = useState<EducationArticle[]>([])
+  const [dbVideos, setDbVideos] = useState<EducationVideo[]>([])
 
   useEffect(() => {
-    fetchDbArticles()
+    fetchDbVideos()
   }, [])
 
-  const fetchDbArticles = async () => {
+  const fetchDbVideos = async () => {
     const { data } = await supabase
       .from("education")
       .select("*")
@@ -105,15 +96,17 @@ export default function Education() {
       .order("created_at", { ascending: false })
 
     if (data) {
-      setDbArticles(
-        data.map((item) => ({
-          id: item.education_id,
-          title: item.title,
-          content: item.content,
-          category: guessCategory(item.title, item.content),
-          icon: <BookOpen className="h-5 w-5" />,
-          isFromDb: true,
-        }))
+      setDbVideos(
+        data
+          .filter((item: any) => item.video_url)
+          .map((item: any) => ({
+            id: item.education_id,
+            title: item.title,
+            description: item.content,
+            videoUrl: item.video_url,
+            category: guessCategory(item.title, item.content),
+            isFromDb: true,
+          }))
       )
     }
   }
@@ -126,22 +119,20 @@ export default function Education() {
     return "lainnya"
   }
 
-  const allArticles = [...dbArticles, ...defaultArticles]
-  const filteredArticles = activeCategory === "semua"
-    ? allArticles
-    : allArticles.filter((a) => a.category === activeCategory)
+  const allVideos = [...dbVideos, ...defaultVideos]
+  const filteredVideos = activeCategory === "semua"
+    ? allVideos
+    : allVideos.filter((v) => v.category === activeCategory)
 
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
-            <GraduationCap className="h-8 w-8 text-primary" />
-            Financial Education
-          </h1>
-          <p className="text-muted-foreground mt-1">Pelajari tips keuangan untuk masa depan yang lebih baik</p>
-        </div>
+      <div>
+        <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
+          <GraduationCap className="h-8 w-8 text-primary" />
+          Financial Education
+        </h1>
+        <p className="text-muted-foreground mt-1">Pelajari tips keuangan melalui video edukatif</p>
       </div>
 
       {/* Category Tabs */}
@@ -159,53 +150,56 @@ export default function Education() {
         </TabsList>
 
         <TabsContent value={activeCategory} className="mt-4">
-          {filteredArticles.length === 0 ? (
+          {filteredVideos.length === 0 ? (
             <Card className="rounded-2xl shadow-soft p-12 text-center">
               <div className="text-muted-foreground">
-                <BookOpen className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                <p>Belum ada artikel di kategori ini.</p>
+                <Play className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                <p>Belum ada video di kategori ini.</p>
               </div>
             </Card>
           ) : (
-            <div className="grid gap-4">
-              {filteredArticles.map((article) => {
-                const cfg = categoryConfig[article.category] || categoryConfig.lainnya
-                const isExpanded = expandedId === article.id
+            <div className="grid gap-4 md:grid-cols-2">
+              {filteredVideos.map((video) => {
+                const cfg = categoryConfig[video.category] || categoryConfig.lainnya
+                const isExpanded = expandedId === video.id
                 return (
                   <Card
-                    key={article.id}
-                    className="rounded-2xl shadow-soft cursor-pointer hover:shadow-md transition-all duration-200"
-                    onClick={() => setExpandedId(isExpanded ? null : article.id)}
+                    key={video.id}
+                    className="rounded-2xl shadow-soft overflow-hidden hover:shadow-md transition-all duration-200"
                   >
-                    <CardHeader className="pb-2">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex items-start gap-3">
-                          <div className={`p-2.5 rounded-xl ${cfg.color} shrink-0`}>
-                            {article.icon}
-                          </div>
-                          <div>
-                            <CardTitle className="text-base font-semibold leading-tight">
-                              {article.title}
+                    {/* Video */}
+                    <VideoPlayer url={video.videoUrl} />
+
+                    {/* Info */}
+                    <div
+                      className="cursor-pointer"
+                      onClick={() => setExpandedId(isExpanded ? null : video.id)}
+                    >
+                      <CardHeader className="pb-2 pt-4">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1">
+                            <CardTitle className="text-sm font-semibold leading-tight">
+                              {video.title}
                             </CardTitle>
                             <div className="flex items-center gap-2 mt-1.5">
                               <Badge variant="secondary" className="text-[10px] px-2">
                                 {cfg.label}
                               </Badge>
-                              {article.isFromDb && (
+                              {video.isFromDb && (
                                 <Badge variant="outline" className="text-[10px] px-2">
                                   Terbaru
                                 </Badge>
                               )}
                             </div>
                           </div>
+                          <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform shrink-0 mt-1 ${isExpanded ? "rotate-90" : ""}`} />
                         </div>
-                        <ChevronRight className={`h-5 w-5 text-muted-foreground transition-transform shrink-0 ${isExpanded ? "rotate-90" : ""}`} />
-                      </div>
-                    </CardHeader>
+                      </CardHeader>
+                    </div>
                     {isExpanded && (
-                      <CardContent className="pt-0">
-                        <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
-                          {article.content}
+                      <CardContent className="pt-0 pb-4">
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                          {video.description}
                         </p>
                       </CardContent>
                     )}
