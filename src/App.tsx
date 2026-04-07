@@ -39,6 +39,7 @@ const App = () => (
               <div className="min-h-screen flex w-full bg-background">
                 <AppSidebar />
                 <main className="flex-1">
+                  <NotificationProvider>
                   <Navbar />
                   <div className="p-0">
                     <Routes>
