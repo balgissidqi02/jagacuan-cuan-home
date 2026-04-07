@@ -127,6 +127,7 @@ export default function SpendingTracker() {
       const { error } = await supabase
         .from('spending_tracker')
         .insert({
+          user_id: userId!,
           budget_id: formData.budget_id,
           description: formData.description,
           amount: parseFloat(formData.amount)

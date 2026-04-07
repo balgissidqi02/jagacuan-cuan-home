@@ -5,6 +5,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppSidebar } from "@/components/AppSidebar";
+import { NotificationProvider } from "@/components/NotificationProvider";
 import { Navbar } from "@/components/Navbar";
 import Index from "./pages/Index";
 import Budgeting from "./pages/Budgeting";
@@ -38,6 +39,7 @@ const App = () => (
               <div className="min-h-screen flex w-full bg-background">
                 <AppSidebar />
                 <main className="flex-1">
+                  <NotificationProvider>
                   <Navbar />
                   <div className="p-0">
                     <Routes>
@@ -53,6 +55,7 @@ const App = () => (
                       <Route path="*" element={<NotFound />} />
                     </Routes>
                   </div>
+                  </NotificationProvider>
                 </main>
               </div>
             </SidebarProvider>
