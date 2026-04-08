@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -6,16 +6,26 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { supabase } from "@/lib/supabaseClient"
+import { supabase } from "@/integrations/supabase/client"
 import { formatRupiah } from "@/utils/currency"
 import { toast } from "sonner"
-import { Utensils, Car, PiggyBank, GraduationCap, MoreHorizontal, CheckCircle, Lock } from "lucide-react"
+import { Utensils, Car, PiggyBank, GraduationCap, MoreHorizontal, CheckCircle, Lock, ShoppingBag, Heart, Zap, Home, Wifi, Gamepad2, Plane, Gift, Coffee, Shirt } from "lucide-react"
 
 const categories = [
   { name: "Food", icon: Utensils, color: "bg-orange-500" },
   { name: "Transport", icon: Car, color: "bg-blue-500" },
-  { name: "Fun", icon: PiggyBank, color: "bg-purple-500" },
+  { name: "Shopping", icon: ShoppingBag, color: "bg-pink-500" },
+  { name: "Health", icon: Heart, color: "bg-red-500" },
   { name: "Study", icon: GraduationCap, color: "bg-green-500" },
+  { name: "Bills", icon: Zap, color: "bg-yellow-500" },
+  { name: "Rent", icon: Home, color: "bg-teal-500" },
+  { name: "Internet", icon: Wifi, color: "bg-indigo-500" },
+  { name: "Entertainment", icon: Gamepad2, color: "bg-purple-500" },
+  { name: "Travel", icon: Plane, color: "bg-sky-500" },
+  { name: "Gift", icon: Gift, color: "bg-rose-500" },
+  { name: "Coffee", icon: Coffee, color: "bg-amber-700" },
+  { name: "Clothing", icon: Shirt, color: "bg-violet-500" },
+  { name: "Savings", icon: PiggyBank, color: "bg-emerald-500" },
   { name: "Other", icon: MoreHorizontal, color: "bg-gray-500" }
 ]
 
@@ -28,22 +38,29 @@ export default function AddBudget() {
     notes: ""
   })
   const [loading, setLoading] = useState(false)
+  const [userId, setUserId] = useState<string | null>(null)
 
-  // Mock user ID for demo - in real app this would come from auth
-  const userId = "123e4567-e89b-12d3-a456-426614174000"
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { navigate('/login'); return }
+      setUserId(user.id)
+    }
+    getUser()
+  }, [navigate])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
     if (!selectedCategory) {
-      toast.error('Please select a category')
+      toast.error('Pilih kategori terlebih dahulu')
       return
     }
-
     if (!formData.amount || parseFloat(formData.amount) <= 0) {
-      toast.error('Budget must be greater than 0')
+      toast.error('Budget harus lebih dari 0')
       return
     }
+    if (!userId) return
 
     setLoading(true)
     
@@ -64,7 +81,7 @@ export default function AddBudget() {
       navigate('/budgeting')
     } catch (error) {
       console.error('Error adding budget:', error)
-      toast.error('Failed to add budget')
+      toast.error('Gagal menambahkan budget')
     } finally {
       setLoading(false)
     }
@@ -94,19 +111,17 @@ export default function AddBudget() {
                     key={category.name}
                     type="button"
                     onClick={() => setSelectedCategory(category.name)}
-                    className={`p-4 rounded-xl border-2 transition-all duration-200 ${
+                    className={`p-3 rounded-xl border-2 transition-all duration-200 ${
                       selectedCategory === category.name
-                        ? category.name === 'Fun' 
-                          ? 'border-purple-500 bg-purple-50' 
-                          : 'border-primary bg-primary/10'
-                        : 'border-gray-200 hover:border-gray-300'
+                        ? 'border-primary bg-primary/10 ring-2 ring-primary/20'
+                        : 'border-muted hover:border-muted-foreground/30'
                     }`}
                   >
-                    <div className="flex flex-col items-center gap-2">
-                      <div className={`w-10 h-10 rounded-lg ${category.color} flex items-center justify-center`}>
-                        <category.icon className="h-5 w-5 text-white" />
+                    <div className="flex flex-col items-center gap-1.5">
+                      <div className={`w-9 h-9 rounded-lg ${category.color} flex items-center justify-center`}>
+                        <category.icon className="h-4 w-4 text-white" />
                       </div>
-                      <span className="text-xs font-medium text-center">{category.name}</span>
+                      <span className="text-[10px] font-medium text-center leading-tight">{category.name}</span>
                     </div>
                   </button>
                 ))}
@@ -128,9 +143,7 @@ export default function AddBudget() {
                   min="0"
                   step="0.01"
                 />
-                <span className="absolute right-3 text-muted-foreground font-medium">
-                  IDR
-                </span>
+                <span className="absolute right-3 text-muted-foreground font-medium">IDR</span>
               </div>
               {formData.amount && (
                 <p className="text-sm text-muted-foreground">

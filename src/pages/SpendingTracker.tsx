@@ -31,41 +31,23 @@ export default function SpendingTracker() {
   const [spendings, setSpendings] = useState<SpendingItem[]>([])
   const [budgets, setBudgets] = useState<Budget[]>([])
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [formData, setFormData] = useState({
-    budget_id: "",
-    description: "",
-    amount: ""
-  })
+  const [formData, setFormData] = useState({ budget_id: "", description: "", amount: "" })
   const [loading, setLoading] = useState(true)
-
-  // Get user from auth
   const [userId, setUserId] = useState<string | null>(null)
 
-  useEffect(() => {
-    getCurrentUser()
-  }, [])
+  useEffect(() => { getCurrentUser() }, [])
 
   useEffect(() => {
     if (userId) {
       fetchData()
-      
-      // Setup realtime subscriptions
       const spendingChannel = supabase
         .channel('spending-changes')
-        .on('postgres_changes', 
-          { event: '*', schema: 'public', table: 'spending_tracker' },
-          () => fetchData()
-        )
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'spending_tracker' }, () => fetchData())
         .subscribe()
-
       const budgetChannel = supabase
         .channel('budget-changes')
-        .on('postgres_changes', 
-          { event: '*', schema: 'public', table: 'budgeting' },
-          () => fetchData()
-        )
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'budgeting' }, () => fetchData())
         .subscribe()
-
       return () => {
         supabase.removeChannel(spendingChannel)
         supabase.removeChannel(budgetChannel)
@@ -75,41 +57,23 @@ export default function SpendingTracker() {
 
   const getCurrentUser = async () => {
     const { data: { user }, error } = await supabase.auth.getUser()
-    if (error || !user) {
-      console.error('User not authenticated:', error)
-      return
-    }
+    if (error || !user) return
     setUserId(user.id)
   }
 
   const fetchData = async () => {
     if (!userId) return
-    
     try {
-      // Fetch budgets
       const { data: budgetsData, error: budgetsError } = await supabase
-        .from('budgeting')
-        .select('*')
-        .eq('user_id', userId)
-
+        .from('budgeting').select('*').eq('user_id', userId)
       if (budgetsError) throw budgetsError
       setBudgets(budgetsData || [])
 
-      // Fetch spending with budget info
       const { data: spendingsData, error: spendingsError } = await supabase
         .from('spending_tracker')
-        .select(`
-          *,
-          budgeting (
-            id,
-            category,
-            amount,
-            spent
-          )
-        `)
+        .select(`*, budgeting (id, category, amount, spent)`)
         .in('budget_id', (budgetsData || []).map(b => b.id))
         .order('created_at', { ascending: false })
-
       if (spendingsError) throw spendingsError
       setSpendings(spendingsData || [])
     } catch (error) {
@@ -122,7 +86,6 @@ export default function SpendingTracker() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
     try {
       const { error } = await supabase
         .from('spending_tracker')
@@ -132,96 +95,66 @@ export default function SpendingTracker() {
           description: formData.description,
           amount: parseFloat(formData.amount)
         })
-
       if (error) throw error
-      
-      toast.success('Spending added successfully!')
+      toast.success('Pengeluaran berhasil ditambahkan!')
       setIsModalOpen(false)
       setFormData({ budget_id: "", description: "", amount: "" })
     } catch (error) {
       console.error('Error adding spending:', error)
-      toast.error('Failed to add spending')
+      toast.error('Gagal menambahkan pengeluaran')
     }
   }
 
-  const groupedSpendings = spendings.reduce((groups, spending) => {
-    const category = spending.budgeting.category
-    if (!groups[category]) {
-      groups[category] = []
-    }
-    groups[category].push(spending)
+  // Group spendings by date
+  const groupedByDate = spendings.reduce((groups, spending) => {
+    const dateKey = new Date(spending.created_at).toLocaleDateString('id-ID', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    })
+    if (!groups[dateKey]) groups[dateKey] = []
+    groups[dateKey].push(spending)
     return groups
   }, {} as Record<string, SpendingItem[]>)
 
-  if (loading) {
-    return <div className="p-6">Loading...</div>
-  }
+  if (loading) return <div className="p-6">Loading...</div>
 
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Spending Tracker</h1>
-          <p className="text-muted-foreground mt-1">Track expenses by category</p>
+          <p className="text-muted-foreground mt-1">Lacak pengeluaran berdasarkan waktu</p>
         </div>
-        
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
           <DialogTrigger asChild>
             <Button className="flex items-center gap-2" disabled={budgets.length === 0}>
-              <Plus className="h-4 w-4" />
-              Add Spending
+              <Plus className="h-4 w-4" /> Add Spending
             </Button>
           </DialogTrigger>
           <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add New Spending</DialogTitle>
-            </DialogHeader>
+            <DialogHeader><DialogTitle>Add New Spending</DialogTitle></DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <Label htmlFor="budget_id">Category</Label>
-                <Select 
-                  value={formData.budget_id} 
-                  onValueChange={(value) => setFormData({...formData, budget_id: value})}
-                  required
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a category" />
-                  </SelectTrigger>
+                <Label>Category</Label>
+                <Select value={formData.budget_id} onValueChange={(v) => setFormData({...formData, budget_id: v})} required>
+                  <SelectTrigger><SelectValue placeholder="Pilih kategori" /></SelectTrigger>
                   <SelectContent>
-                    {budgets.map((budget) => (
-                      <SelectItem key={budget.id} value={budget.id}>
-                        {budget.category} ({formatRupiah(budget.amount - budget.spent)} left)
+                    {budgets.map((b) => (
+                      <SelectItem key={b.id} value={b.id}>
+                        {b.category} ({formatRupiah(b.amount - (b.spent || 0))} left)
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => setFormData({...formData, description: e.target.value})}
-                  placeholder="What did you spend on?"
-                  required
-                />
+                <Label>Description</Label>
+                <Textarea value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} placeholder="Apa yang kamu belanjakan?" required />
               </div>
               <div>
-                <Label htmlFor="amount">Amount</Label>
-                <Input
-                  id="amount"
-                  type="number"
-                  value={formData.amount}
-                  onChange={(e) => setFormData({...formData, amount: e.target.value})}
-                  placeholder="0"
-                  required
-                  min="0"
-                  step="0.01"
-                />
+                <Label>Amount</Label>
+                <Input type="number" value={formData.amount} onChange={(e) => setFormData({...formData, amount: e.target.value})} placeholder="0" required min="0" step="0.01" />
               </div>
-              <Button type="submit" className="w-full">
-                Add Spending
-              </Button>
+              <Button type="submit" className="w-full">Add Spending</Button>
             </form>
           </DialogContent>
         </Dialog>
@@ -231,51 +164,53 @@ export default function SpendingTracker() {
         <Card className="rounded-2xl shadow-soft p-12 text-center">
           <div className="text-muted-foreground">
             <Plus className="h-16 w-16 mx-auto mb-4 opacity-50" />
-            <h3 className="text-lg font-medium mb-2">No budget categories</h3>
-            <p className="text-sm">Create budget categories first to track spending</p>
+            <h3 className="text-lg font-medium mb-2">Belum ada kategori budget</h3>
+            <p className="text-sm">Buat kategori budget terlebih dahulu untuk melacak pengeluaran</p>
           </div>
         </Card>
       )}
 
-      {/* Spending by Category */}
+      {/* Spending grouped by date */}
       <div className="space-y-6">
-        {Object.entries(groupedSpendings).map(([category, items]) => (
-          <Card key={category} className="rounded-2xl shadow-soft">
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold">{category}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {items.map((spending) => (
-                  <div key={spending.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                    <div className="flex-1">
-                      <p className="font-medium text-foreground">{spending.description}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {new Date(spending.created_at).toLocaleDateString('id-ID', {
-                          weekday: 'long',
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
-                        })}
-                      </p>
+        {Object.entries(groupedByDate).map(([date, items]) => {
+          const dayTotal = items.reduce((sum, s) => sum + s.amount, 0)
+          return (
+            <Card key={date} className="rounded-2xl shadow-soft">
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span className="text-base font-semibold">{date}</span>
+                  <span className="text-sm font-medium text-muted-foreground">{formatRupiah(dayTotal)}</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {items.map((spending) => (
+                    <div key={spending.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                      <div className="flex-1">
+                        <p className="font-medium text-foreground">{spending.description}</p>
+                        <p className="text-xs text-muted-foreground">{spending.budgeting?.category || '-'}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-semibold text-foreground">{formatRupiah(spending.amount)}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {new Date(spending.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-semibold text-foreground">{formatRupiah(spending.amount)}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )
+        })}
       </div>
 
       {spendings.length === 0 && budgets.length > 0 && (
         <Card className="rounded-2xl shadow-soft p-12 text-center">
           <div className="text-muted-foreground">
             <Plus className="h-16 w-16 mx-auto mb-4 opacity-50" />
-            <h3 className="text-lg font-medium mb-2">No spending recorded</h3>
-            <p className="text-sm">Start tracking your expenses by adding your first spending</p>
+            <h3 className="text-lg font-medium mb-2">Belum ada pengeluaran</h3>
+            <p className="text-sm">Mulai lacak pengeluaranmu dengan menambahkan yang pertama</p>
           </div>
         </Card>
       )}
