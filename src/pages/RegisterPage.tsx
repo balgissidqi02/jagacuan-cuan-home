@@ -54,22 +54,6 @@ export default function RegisterPage() {
 
       if (error) throw error
 
-      // Also insert into users table
-      if (data.user) {
-        const { error: userError } = await supabase
-          .from('users')
-          .insert({
-            user_id: data.user.id,
-            username: formData.username,
-            email: formData.email,
-            password: formData.password // Note: In production, you shouldn't store plain text passwords
-          })
-        
-        if (userError) {
-          console.error('User table insert error:', userError)
-        }
-      }
-
       console.log('Registration data:', data)
       toast.success("Registrasi berhasil! Selamat datang!")
       navigate('/')
